@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.exaple.audioplayer.ui.theme.AudioPlayerTheme
+import com.exaple.audioplayer.ui.views.AudioPlayer
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,7 +13,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AudioPlayerTheme {
-
+                AudioPlayer()
             }
         }
     }
