@@ -38,7 +38,7 @@ import java.io.File
 
 @OptIn(UnstableApi::class) // Indica que estamos utilizando una API inestable de Media3.
 @Composable
-fun AudioPlayer1(fileName: String) {
+fun AudioPlayerGif(fileName: String) {
     val context = LocalContext.current
     val audio = File(context.filesDir, fileName) // Archivo de audio almacenado en el directorio interno del dispositivo.
     val gif = File(context.filesDir, "gif") // Archivo GIF almacenado en el directorio interno.

@@ -34,7 +34,7 @@ import java.io.File
 
 @OptIn(UnstableApi::class) // Indica que estamos utilizando una API inestable de ExoPlayer.
 @Composable
-fun AudioPlayer2(fileName: String) {
+fun AudioPlayerImage(fileName: String) {
 
     // Contexto de la aplicación, necesario para acceder a recursos y archivos locales.
     val context = LocalContext.current
