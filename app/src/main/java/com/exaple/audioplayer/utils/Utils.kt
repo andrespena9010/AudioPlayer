@@ -122,7 +122,7 @@ class ExoPlayerExample : ExoPlayer {
     }
 
     override fun getVolume(): Float {
-        TODO("Not yet implemented")
+        return 0f
     }
 
     override fun clearVideoSurface() {

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -30,8 +31,10 @@ import androidx.compose.ui.unit.dp
 fun SliderPlayer(
     position: Long,
     duration: Long,
-    onSeek: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    timeInfo: Boolean = false,
+    onSeek: (Long) -> Unit = {},
+    onDrag: (Long) -> Unit = {}
 ) {
 
     var width by remember { mutableIntStateOf( 0 ) }
@@ -39,15 +42,14 @@ fun SliderPlayer(
     var dragged by remember { mutableStateOf( false ) }
 
     val sliderFraction: Float = if (dragged && width != 0) {
-        //Log.i("INFOTEST","Recompone ancho: DRAGGED" )
         ( dragPos / width ).coerceIn(0f, 1f)
     } else {
-        //Log.i("INFOTEST","Recompone ancho" )
         ( position / duration.toFloat() ).coerceIn(0f, 1f)
     }
 
     Box(
         modifier = modifier
+            .fillMaxHeight()
             .onSizeChanged { newSize ->
                 width = newSize.width
             }
@@ -68,11 +70,11 @@ fun SliderPlayer(
                     onDrag = { pointer, offset ->
                         pointer.consume()
                         dragPos += offset.x
+                        onDrag( ( duration * ( dragPos / width ).coerceIn(0f, 1f) ).toLong() )
                     },
                     onDragEnd = {
-                        val fraction = ( dragPos / width ).coerceIn(0f, 1f)
                         dragged = false
-                        onSeek( ( duration * fraction ).toLong() )
+                        onSeek( ( duration * ( dragPos / width ).coerceIn(0f, 1f) ).toLong() )
                     }
                 )
             },
@@ -82,22 +84,27 @@ fun SliderPlayer(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(
+                    RoundedCornerShape(20.dp)
+                )
                 .height(5.dp)
                 .background(Color.Gray.copy(alpha = 0.5f)),
             contentAlignment = Alignment.CenterStart
         ){
 
-            // --- Barra de progreso (negro) ---
             Box(
                 modifier = Modifier
-                    .fillMaxWidth( sliderFraction ) // with(density) { (sliderPosition.toFloat() * width).toDp() }
+                    .fillMaxWidth( sliderFraction )
+                    .clip(
+                        RoundedCornerShape(20.dp)
+                    )
                     .height(3.dp)
                     .background(Color.Black)
             )
 
         }
 
-        if ( dragged ){
+        if ( dragged && timeInfo ){
 
             TimeInfo(
                 modifier = Modifier
@@ -116,7 +123,7 @@ fun SliderPlayer(
 
 @Preview(
     widthDp = 100,
-    heightDp = 30
+    heightDp = 20
 )
 @Composable
 private fun Preview(){

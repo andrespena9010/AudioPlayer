@@ -25,6 +25,8 @@ class MainActivity : ComponentActivity() {
 
                 VideoPlayer4K(
                     listOf(
+                        MediaItem.fromUri( File( filesDir, "Porco Rosso MultiAudio.mp4" ).toUri() ),
+                        MediaItem.fromUri( File( filesDir, "v1_3840_2160.mp4" ).toUri() ),
                         MediaItem.Builder()
                             .setUri( File( filesDir, "big_buck_bunny.mp4" ).toUri() )
                             .setSubtitleConfigurations( listOf( subBunny ) )
@@ -36,6 +38,7 @@ class MainActivity : ComponentActivity() {
                         MediaItem.fromUri( File( filesDir, "reel.mp4" ).toUri() )
                     )
                 )
+
             }
         }
     }
