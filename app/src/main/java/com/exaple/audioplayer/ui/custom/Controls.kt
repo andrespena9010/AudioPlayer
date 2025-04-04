@@ -122,12 +122,14 @@ fun Controls(
             if (group.type == C.TRACK_TYPE_AUDIO) {
                 if ( group.mediaTrackGroup.length > 0 ){
                     val format = group.mediaTrackGroup.getFormat(0)
-                    audioLs.add(
-                        Language(
-                            mediaTrackGroupId = group.mediaTrackGroup.id,
-                            languageIso6392Name = format.language.toString()
+                    if ( format.language.toString() != "und" ){
+                        audioLs.add(
+                            Language(
+                                mediaTrackGroupId = group.mediaTrackGroup.id,
+                                languageIso6392Name = format.language.toString()
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
@@ -331,7 +333,7 @@ fun Controls(
                 ){
 
 
-                    if ( showItems && items.audioList.isNotEmpty() ){
+                    if ( showItems && items.audioList.size > 1 ){
 
                         Box(
                             modifier = Modifier
@@ -415,7 +417,7 @@ fun Controls(
                             .padding(start = 10.dp, end = 10.dp),
                         position = currentPosition,
                         duration = duration,
-                        onSeek = { newPos ->
+                        onTapOrDragEnd = { newPos ->
                             if ( player.playbackState == Player.STATE_READY ){
                                 player.seekTo( newPos )
                                 currentPosition = player.currentPosition

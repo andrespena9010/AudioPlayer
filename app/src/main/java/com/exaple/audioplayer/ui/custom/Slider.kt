@@ -33,7 +33,7 @@ fun SliderPlayer(
     duration: Long,
     modifier: Modifier = Modifier,
     timeInfo: Boolean = false,
-    onSeek: (Long) -> Unit = {},
+    onTapOrDragEnd: (Long) -> Unit = {},
     onDrag: (Long) -> Unit = {}
 ) {
 
@@ -56,7 +56,7 @@ fun SliderPlayer(
             .pointerInput(Unit){
                 detectTapGestures(
                     onTap = { offset ->
-                        onSeek( ( duration * ( offset.x / width ).coerceIn(0f, 1f) ).toLong() )
+                        onTapOrDragEnd( ( duration * ( offset.x / width ).coerceIn(0f, 1f) ).toLong() )
                     }
                 )
             }
@@ -74,7 +74,7 @@ fun SliderPlayer(
                     },
                     onDragEnd = {
                         dragged = false
-                        onSeek( ( duration * ( dragPos / width ).coerceIn(0f, 1f) ).toLong() )
+                        onTapOrDragEnd( ( duration * ( dragPos / width ).coerceIn(0f, 1f) ).toLong() )
                     }
                 )
             },
@@ -130,6 +130,6 @@ private fun Preview(){
     SliderPlayer(
         position = 450L,
         duration = 900L,
-        onSeek = {}
+        onTapOrDragEnd = {}
     )
 }
