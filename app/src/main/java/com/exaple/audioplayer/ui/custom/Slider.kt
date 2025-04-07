@@ -23,10 +23,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 
+/**
+ * Slider personalizado para control de reproducción multimedia con:
+ * - Interacción táctil (toque y arrastre)
+ * - Visualización de progreso
+ * - Opción para mostrar tiempo actual durante el arrastre
+ *
+ * @param position Posición actual en milisegundos
+ * @param duration Duración total en milisegundos
+ * @param modifier Modificador para personalizar el layout
+ * @param timeInfo Habilita mostrar el tiempo durante el arrastre
+ * @param onTapOrDragEnd Callback al finalizar interacción (nueva posición)
+ * @param onDrag Callback durante el arrastre (posición actual)
+ */
 @Composable
 fun SliderPlayer(
     position: Long,
@@ -36,100 +48,82 @@ fun SliderPlayer(
     onTapOrDragEnd: (Long) -> Unit = {},
     onDrag: (Long) -> Unit = {}
 ) {
+    // Estados para controlar el slider
+    var width by remember { mutableIntStateOf(0) } // Ancho total del slider
+    var dragPos by remember { mutableFloatStateOf(0f) } // Posición de arrastre
+    var dragged by remember { mutableStateOf(false) } // Estado de arrastre
 
-    var width by remember { mutableIntStateOf( 0 ) }
-    var dragPos by remember { mutableFloatStateOf( 0f ) }
-    var dragged by remember { mutableStateOf( false ) }
-
+    // Calcula la fracción de progreso (0-1)
     val sliderFraction: Float = if (dragged && width != 0) {
-        ( dragPos / width ).coerceIn(0f, 1f)
+        (dragPos / width).coerceIn(0f, 1f) // Usa posición de arrastre si está activo
     } else {
-        ( position / duration.toFloat() ).coerceIn(0f, 1f)
+        (position / duration.toFloat()).coerceIn(0f, 1f) // Usa posición normal
     }
 
     Box(
         modifier = modifier
             .fillMaxHeight()
             .onSizeChanged { newSize ->
-                width = newSize.width
+                width = newSize.width // Actualiza el ancho disponible
             }
-            .pointerInput(Unit){
+            // Detección de toques simples
+            .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = { offset ->
-                        onTapOrDragEnd( ( duration * ( offset.x / width ).coerceIn(0f, 1f) ).toLong() )
+                        // Calcula nueva posición basada en el toque
+                        onTapOrDragEnd((duration * (offset.x / width).coerceIn(0f, 1f)).toLong())
                     }
                 )
             }
+            // Detección de gestos de arrastre
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragStart = { offset ->
                         dragged = true
-                        dragPos = 0f
-                        dragPos += offset.x
+                        dragPos = offset.x // Inicia posición de arrastre
                     },
                     onDrag = { pointer, offset ->
                         pointer.consume()
-                        dragPos += offset.x
-                        onDrag( ( duration * ( dragPos / width ).coerceIn(0f, 1f) ).toLong() )
+                        dragPos += offset.x // Actualiza posición durante arrastre
+                        onDrag((duration * (dragPos / width).coerceIn(0f, 1f)).toLong())
                     },
                     onDragEnd = {
-                        dragged = false
-                        onTapOrDragEnd( ( duration * ( dragPos / width ).coerceIn(0f, 1f) ).toLong() )
+                        dragged = false // Finaliza arrastre
+                        onTapOrDragEnd((duration * (dragPos / width).coerceIn(0f, 1f)).toLong())
                     }
                 )
             },
         contentAlignment = Alignment.CenterStart
     ) {
-
+        // Barra de fondo del slider
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(
-                    RoundedCornerShape(20.dp)
-                )
+                .clip(RoundedCornerShape(20.dp))
                 .height(5.dp)
                 .background(Color.Gray.copy(alpha = 0.5f)),
             contentAlignment = Alignment.CenterStart
-        ){
-
+        ) {
+            // Barra de progreso (relleno)
             Box(
                 modifier = Modifier
-                    .fillMaxWidth( sliderFraction )
-                    .clip(
-                        RoundedCornerShape(20.dp)
-                    )
+                    .fillMaxWidth(sliderFraction) // Rellena según progreso
+                    .clip(RoundedCornerShape(20.dp))
                     .height(3.dp)
                     .background(Color.Black)
             )
-
         }
 
-        if ( dragged && timeInfo ){
-
+        // Muestra el tiempo durante el arrastre (si está habilitado)
+        if (dragged && timeInfo) {
             TimeInfo(
                 modifier = Modifier
-                    .offset { IntOffset( ( dragPos -50 ).toInt() , -100 ) }
-                    .clip(
-                        RoundedCornerShape(20.dp)
-                    )
-                    .background( Color.Gray.copy(alpha = 0.5f) )
+                    .offset { IntOffset((dragPos - 50).toInt(), -100) } // Posición sobre el dedo
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Color.Gray.copy(alpha = 0.5f))
                     .padding(5.dp),
-                time = ( ( dragPos / width ).coerceIn(0f, 1f) * duration ).toLong()
+                time = ((dragPos / width).coerceIn(0f, 1f) * duration).toLong()
             )
         }
-
     }
-}
-
-@Preview(
-    widthDp = 100,
-    heightDp = 20
-)
-@Composable
-private fun Preview(){
-    SliderPlayer(
-        position = 450L,
-        duration = 900L,
-        onTapOrDragEnd = {}
-    )
 }

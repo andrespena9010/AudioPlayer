@@ -23,67 +23,78 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.exaple.audioplayer.ui.viewmodels.ExoplayerViewModel
 import com.exaple.audioplayer.ui.viewmodels.PlayerViewModel
 
+/**
+ * Componente principal que contiene todos los controles del reproductor multimedia.
+ *
+ * @param modifier Modificador para personalizar el diseño del componente.
+ * @param viewModel ViewModel que proporciona los datos y la lógica del reproductor.
+ */
 @Composable
 fun Controls(
     modifier: Modifier = Modifier,
     viewModel: PlayerViewModel = ExoplayerViewModel
 ) {
+    // Obtener estados observables del ViewModel
+    val items by viewModel.items.collectAsStateWithLifecycle() // Lista de elementos multimedia
+    val loading by viewModel.loading.collectAsStateWithLifecycle() // Estado de carga
+    val showControls by viewModel.showControls.collectAsStateWithLifecycle() // Visibilidad de controles
+    val showLanguageItems by viewModel.showLanguageItems.collectAsStateWithLifecycle() // Visibilidad de selector de idioma
+    val backGround = Color(0x33888888) // Color de fondo semitransparente
 
-    val items by viewModel.items.collectAsStateWithLifecycle()
-    val loading by viewModel.loading.collectAsStateWithLifecycle()
-    val showControls by viewModel.showControls.collectAsStateWithLifecycle()
-    val showLanguageItems by viewModel.showLanguageItems.collectAsStateWithLifecycle()
-    val backGround = Color(0x33888888)
-
+    // Contenedor principal que ocupa toda la pantalla
     Box(
         modifier = modifier
             .fillMaxSize()
+            // Manejar eventos de toque para ocultar controles
             .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
                         awaitPointerEvent(pass = PointerEventPass.Final)
-                        viewModel.hide()
+                        viewModel.hide() // Oculta los controles al tocar la pantalla
                     }
                 }
             },
         contentAlignment = Alignment.Center
     ) {
-
+        // Mostrar indicador de carga si está cargando
         if (loading) {
             CircularProgressIndicator(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(100.dp) // Tamaño grande del indicador
             )
         }
 
+        // Componente para manejar búsqueda con doble toque
         DoubleTapSeekControl(
             backGround = backGround
         )
 
+        // Mostrar controles solo si showControls es true
         if (showControls) {
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-
+                // Sección superior (para selector de idioma)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
+                        .weight(1f), // Ocupa el espacio disponible
                     contentAlignment = Alignment.BottomEnd
                 ) {
+                    // Mostrar selector de idioma si hay múltiples pistas de audio
                     if (showLanguageItems && items.audioList.size > 1) {
                         Box(
                             modifier = Modifier
-                                .padding(30.dp),
+                                .padding(30.dp), // Margen interno
                             contentAlignment = Alignment.Center
                         ) {
-                            LanguageItems()
+                            LanguageItems() // Componente de selección de idioma
                         }
                     }
                 }
 
+                // Barra de progreso (slider)
                 Row(
                     modifier = Modifier
                         .height(30.dp)
@@ -91,35 +102,32 @@ fun Controls(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    SliderCustom( backGround = backGround )
+                    SliderCustom(backGround = backGround) // Barra deslizante personalizada
                 }
 
+                // Espaciador
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(10.dp)
                 )
 
+                // Controles inferiores (play/pause, etc.)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp)
                 ) {
-
-                    BottomControls( backGround =  backGround )
-
+                    BottomControls(backGround = backGround) // Componente con botones de control
                 }
 
+                // Espaciador final
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(10.dp)
                 )
-
             }
-
         }
-
     }
-
 }

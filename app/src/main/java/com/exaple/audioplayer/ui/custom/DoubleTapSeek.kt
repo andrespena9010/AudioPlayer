@@ -25,91 +25,98 @@ import com.exaple.audioplayer.R
 import com.exaple.audioplayer.ui.viewmodels.ExoplayerViewModel
 import com.exaple.audioplayer.ui.viewmodels.PlayerViewModel
 
+/**
+ * Componente de controles táctiles para:
+ * - Navegación rápida (15 segundos adelante/atrás con doble tap)
+ * - Toggle de visibilidad de controles UI
+ * - Feedback visual durante saltos temporales
+ *
+ * @param viewModel ViewModel que gestiona el estado del reproductor
+ * @param backGround Color de fondo para los iconos de feedback
+ */
 @Composable
 fun DoubleTapSeekControl(
     viewModel: PlayerViewModel = ExoplayerViewModel,
     backGround: Color
-){
-
+) {
+    // Estados observados del reproductor
     val showControls by viewModel.showControls.collectAsStateWithLifecycle()
-    val fordward by viewModel.fordward.collectAsStateWithLifecycle()
+    val forward by viewModel.fordward.collectAsStateWithLifecycle()
     val backward by viewModel.backward.collectAsStateWithLifecycle()
 
+    // Layout principal dividido en dos zonas táctiles
     Row(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
-    ){
-
+    ) {
+        // Zona izquierda (retroceso 15s)
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
-                .pointerInput(Unit){
+                .pointerInput(Unit) {
                     detectTapGestures(
-                        onTap = {
-                            viewModel.showControls( !showControls )
-                            viewModel.showLanguageItems( false )
+                        onTap = { // Tap simple
+                            viewModel.showControls(!showControls)
+                            viewModel.showLanguageItems(false)
                         },
-                        onDoubleTap = {
+                        onDoubleTap = { // Doble tap
                             viewModel.jumpTo(
-                                time = (15*1000),
-                                left = true
+                                time = (15 * 1000), // 15 segundos
+                                left = true // Dirección: atrás
                             )
                         }
                     )
                 },
             contentAlignment = Alignment.Center
-        ){
-
-            if ( backward ){
+        ) {
+            // Muestra icono de retroceso durante la operación
+            if (backward) {
                 Icon(
                     painter = painterResource(R.drawable.backward),
-                    contentDescription = "backward",
+                    contentDescription = "Retroceso 15 segundos",
                     modifier = Modifier
                         .size(100.dp)
                         .clip(RoundedCornerShape(30.dp))
-                        .background( backGround )
+                        .background(backGround)
                         .padding(10.dp),
                     tint = Color.White
                 )
             }
-
         }
 
+        // Zona derecha (avance 15s)
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
-                .pointerInput(Unit){
+                .pointerInput(Unit) {
                     detectTapGestures(
                         onTap = {
-                            viewModel.showControls( !showControls )
-                            viewModel.showLanguageItems( false )
+                            viewModel.showControls(!showControls)
+                            viewModel.showLanguageItems(false)
                         },
                         onDoubleTap = {
-                            viewModel.jumpTo( time = (15*1000) )
+                            viewModel.jumpTo(time = (15 * 1000)) // 15 segundos adelante
                         }
                     )
                 },
             contentAlignment = Alignment.Center
-        ){
-
-            if ( fordward ){
+        ) {
+            // Muestra icono de avance durante la operación
+            if (forward) {
                 Icon(
                     painter = painterResource(R.drawable.fordward),
-                    contentDescription = "fordward",
+                    contentDescription = "Avance 15 segundos",
                     modifier = Modifier
                         .size(100.dp)
                         .clip(RoundedCornerShape(30.dp))
-                        .background( backGround )
+                        .background(backGround)
                         .padding(10.dp),
                     tint = Color.White
                 )
             }
-
         }
-
     }
 }

@@ -7,39 +7,46 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 
+/**
+ * Componente que muestra el tiempo de reproducción formateado
+ *
+ * @param modifier Modificador para personalizar el layout del componente
+ * @param time Tiempo actual en milisegundos que será formateado
+ */
 @Composable
 fun TimeInfo(
-    modifier: Modifier = Modifier,
-    time: Long
-){
+    modifier: Modifier = Modifier,  // Modificador por defecto vacío
+    time: Long  // Tiempo en ms a mostrar
+) {
+    // Contenedor que centra el texto
     Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ){
+        modifier = modifier,  // Aplica los modificadores recibidos
+        contentAlignment = Alignment.Center  // Centra el contenido
+    ) {
+        // Texto que muestra el tiempo formateado
         Text(
-            text = formatTime(time),
-            color = Color.White
+            text = formatTime(time),  // Llama a la función de formateo
+            color = Color.White  // Color blanco para mejor visibilidad
         )
     }
 }
 
-@SuppressLint("DefaultLocale")
-fun formatTime( millis: Long ): String {
-    val totalSeconds = millis / 1000
-    val hours = totalSeconds / 3600
-    val remainingSeconds = totalSeconds % 3600
-    val minutes = remainingSeconds / 60
-    val seconds = remainingSeconds % 60
+/**
+ * Función de utilidad para formatear milisegundos a formato HH:MM:SS
+ *
+ * @param millis Tiempo en milisegundos a formatear
+ * @return String con el tiempo formateado (ej: "1:23:45")
+ */
+@SuppressLint("DefaultLocale")  // Suprime warning de formato localizado
+fun formatTime(millis: Long): String {
+    // Conversión y cálculos:
+    val totalSeconds = millis / 1000  // Convierte ms a segundos
+    val hours = totalSeconds / 3600  // Calcula horas completas
+    val remainingSeconds = totalSeconds % 3600  // Segundos restantes
+    val minutes = remainingSeconds / 60  // Calcula minutos
+    val seconds = remainingSeconds % 60  // Segundos finales
 
+    // Formatea a 2 dígitos para minutos/segundos, 1 para horas
     return String.format("%01d:%02d:%02d", hours, minutes, seconds)
-}
-
-@Preview
-@Composable
-private fun PreviewInfo(){
-    TimeInfo(
-        time = 92894230L
-    )
 }

@@ -20,44 +20,56 @@ import com.exaple.audioplayer.R
 import com.exaple.audioplayer.ui.viewmodels.ExoplayerViewModel
 import com.exaple.audioplayer.ui.viewmodels.PlayerViewModel
 
+/**
+ * Barra de controles inferiores del reproductor que incluye:
+ * - Controles de reproducción (anterior/pausa-play/siguiente)
+ * - Control de volumen (slider + mute)
+ * - Acceso a configuración de idiomas
+ *
+ * @param viewModel ViewModel que gestiona el estado del reproductor
+ * @param backGround Color de fondo para los iconos de control
+ */
 @Composable
 fun BottomControls(
     viewModel: PlayerViewModel = ExoplayerViewModel,
     backGround: Color
-){
-
+) {
+    // Estados observados del reproductor
     val currentVolume by viewModel.currentVolume.collectAsStateWithLifecycle()
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
     val isMute by viewModel.isMute.collectAsStateWithLifecycle()
     val showLanguageItems by viewModel.showLanguageItems.collectAsStateWithLifecycle()
 
+    // Fila principal de controles de reproducción
     Row(
         modifier = Modifier
-            .height(40.dp)
-            .fillMaxWidth(),
+            .height(40.dp)  // Altura fija para la fila
+            .fillMaxWidth(),  // Ancho completo
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center  // Centrado horizontal
     ) {
+        // Botón: Anterior
         IconControls(
             source = R.drawable.back,
-            contentDescription = "Previous",
+            contentDescription = "Pista anterior",
             onTap = { viewModel.goToPreviousMedia() },
             backGround = backGround
         )
 
-        Spacer(Modifier.size(10.dp))
+        Spacer(Modifier.size(10.dp))  // Separación entre botones
 
+        // Botón: Play/Pause (cambia según estado actual)
         if (isPlaying) {
             IconControls(
                 source = R.drawable.pausa,
-                contentDescription = "Pause",
+                contentDescription = "Pausar",
                 onTap = { viewModel.pause() },
                 backGround = backGround
             )
         } else {
             IconControls(
                 source = R.drawable.play,
-                contentDescription = "Play",
+                contentDescription = "Reproducir",
                 onTap = { viewModel.play() },
                 backGround = backGround
             )
@@ -65,60 +77,58 @@ fun BottomControls(
 
         Spacer(Modifier.size(10.dp))
 
+        // Botón: Siguiente
         IconControls(
             source = R.drawable.next,
-            contentDescription = "Next",
+            contentDescription = "Pista siguiente",
             onTap = { viewModel.goToNextMedia() },
             backGround = backGround
         )
-
     }
 
+    // Fila secundaria de controles adicionales (derecha de la pantalla)
     Row(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalArrangement = Arrangement.End,
+        modifier = Modifier.fillMaxSize(),  // Ocupa el espacio disponible
+        horizontalArrangement = Arrangement.End,  // Alineado a la derecha
         verticalAlignment = Alignment.CenterVertically
     ) {
-
+        // Botón: Mute/Unmute (cambia según estado actual)
         if (isMute) {
             IconControls(
                 source = R.drawable.mute,
-                contentDescription = "Mute",
+                contentDescription = "Activar sonido",
                 onTap = { viewModel.mute(false) },
                 backGround = backGround
             )
         } else {
             IconControls(
                 source = R.drawable.volume_on,
-                contentDescription = "Volume on",
+                contentDescription = "Silenciar",
                 onTap = { viewModel.mute(true) },
                 backGround = backGround
             )
         }
 
+        // Control deslizante de volumen
         SliderPlayer(
             modifier = Modifier
-                .width(100.dp)
-                .padding(start = 10.dp, end = 10.dp),
-            position = (currentVolume * 100).toLong(),
-            duration = 100,
-            onDrag = { newPos ->
-                viewModel.setVolume(newPos)
-            }
+                .width(100.dp)  // Ancho fijo para el slider
+                .padding(start = 10.dp, end = 10.dp),  // Margen horizontal
+            position = (currentVolume * 100).toLong(),  // Convierte a rango 0-100
+            duration = 100,  // Rango máximo del slider
+            onDrag = { newPos -> viewModel.setVolume(newPos) }  // Actualiza volumen
         )
 
         Spacer(Modifier.size(10.dp))
 
+        // Botón: Configuración de idiomas
         IconControls(
             source = R.drawable.settings,
-            contentDescription = "Settings",
+            contentDescription = "Opciones de idioma",
             onTap = { viewModel.showLanguageItems(!showLanguageItems) },
             backGround = backGround
         )
 
-        Spacer(Modifier.size(20.dp))
-
+        Spacer(Modifier.size(20.dp))  // Margen final derecho
     }
-
 }
